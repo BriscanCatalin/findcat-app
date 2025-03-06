@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invisible Cat Hunt 🐱</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --bg: #ecf0f1;
+            --text: #2c3e50;
+            --grid-size: {{ grid_size }}; /* Numărul de rânduri/coloane */
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--text);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden; /* Previne derulare generală */
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 25% 75%; /* Left 25%, Right 75% */
+            gap: 2rem;
+            max-width: 100vw;
+            width: 100%;
+            padding: 2rem;
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        /* Left Panel (25%) */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            height: 85%;
+            padding-right: 0.5rem;
+            padding-left: 0.5rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            background: var(--secondary);
+            color: white;
+            margin-top: 1rem;
+            border-radius: 10px;
+        }
+
+        .instructions {
+            padding: 1rem;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+
+        .message-box {
+            padding: 1rem;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 0.5fr 0.5fr 0.5fr 0.5fr;
+            padding: 1rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            justify-items: center;
+        }
+
+        .history-log {
+            flex: 1;
+            max-height: 300px; /* Limită maximă pentru înălțime */
+            overflow-y: auto; /* Scrolabiliy doar aici */
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+
+        .history-log::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .history-log p {
+            margin: 5px 0;
+            padding: 5px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        /* Right Panel (75%) */
+        .game-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 85%;
+            padding-right: 2rem;
+            overflow: hidden; /* Previne derulare */
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(var(--grid-size), minmax(0, 1fr)); /* Auto-sizing cells */
+            grid-template-rows: repeat(var(--grid-size), minmax(0, 1fr)); /* Matrice pătratică */
+            height: 100%;
+            width: 100%; /* Ocupă întreaga lățime */
+            aspect-ratio: 1 / 0.70; /* Păstrează proporții pătratice */
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .cell {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .player {
+            width: 80%;
+            height: 80%;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(231,76,60,0.5);
+        }
+
+        .cat-found {
+            width: 100%;
+            height: 100%;
+            background: gold;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: celebrate 2s infinite;
+        }
+
+        .neighboring-cell {
+            background: orange !important;
+            animation: flash 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(0.9); }
+        }
+
+        @keyframes celebrate {
+            0% { transform: scale(1); background: gold; }
+            50% { transform: scale(1.2); background: orange; }
+            100% { transform: scale(1); background: gold; }
+        }
+
+        @keyframes flash {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .control-btn {
+            padding: 15px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(52,152,219,0.3);
+            transition: all 0.3s;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(52,152,219,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Panel (25%) -->
+        <div class="sidebar">
+            <!-- Title -->
+            <div class="header">
+                <h1>Invisible Cat Hunt 🐱</h1>
+            </div>
+
+            <!-- Instructions -->
+            <div class="instructions">
+                <p>Find the hidden cat by clicking on cells or using arrow keys.</p>
+                <p>Listen for hints about the cat's location.</p>
+            </div>
+
+            <!-- Message Box -->
+            <div class="message-box" id="message-box">🔍 Find the hidden cat!</div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <button class="control-btn" onclick="movePlayer('north')">⇧</button>
+                <button class="control-btn" onclick="movePlayer('west')">⇦</button>
+                <button class="control-btn" onclick="movePlayer('east')">⇨</button>
+                <button class="control-btn" onclick="movePlayer('south')">⇩</button>
+            </div>
+
+            <!-- History Log -->
+            <div class="history-log" id="history-log"></div>
+        </div>
+
+        <!-- Right Panel (75%) -->
+        <div class="game-container">
+            <div class="grid">
+                {% for i in range(grid_size) %}
+                    {% for j in range(grid_size) %}
+                        <div class="cell" data-x="{{ i }}" data-y="{{ j }}" onclick="clickCell({{ i }}, {{ j }})"></div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const GRID_SIZE = {{ grid_size }};
+        let playerPosition = [0, 0];
+
+        function clickCell(x, y) {
+            // Simulează mișcare către celulă clicată
+            movePlayerToPosition(x, y);
+        }
+
+        function movePlayerToPosition(x, y) {
+            // Actualizează poziția jucătorului temporar
+            playerPosition = [x, y];
+
+            // Apelează backend-ul pentru validare
+            fetch("/move", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ direction: `to_${x}_${y}` }) // Custom direction format
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Actualizează grila cu noua poziție
+                updateGrid(data.player_position);
+
+                // Actualizează mesajele și istoricul
+                logMove(`to_${x}_${y}`);
+                showMessage(data.message);
+
+                // Verifică dacă s-a găsit pisica
+                if (data.message.includes("found")) {
+                    showCatFoundEffect(data.player_position);
+                }
+            });
+        }
+
+        function logMove(direction) {
+            const history = document.getElementById("history-log");
+            const entry = document.createElement("p");
+            entry.textContent = `→ ${new Date().toLocaleTimeString()} Moved ${direction}`;
+            entry.className = "log-entry";
+            history.prepend(entry);
+        }
+
+        function showMessage(message) {
+            const messageBox = document.getElementById("message-box");
+            messageBox.textContent = message;
+        }
+
+        function updateGrid(playerPosition) {
+            const cells = document.querySelectorAll(".cell");
+            cells.forEach(cell => cell.innerHTML = ""); // Reset all cells
+            cells.forEach(cell => cell.classList.remove("neighboring-cell")); // Remove previous effects
+
+            const x = playerPosition[0];
+            const y = playerPosition[1];
+
+            // Ensure position is within bounds
+            if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE) {
+                const index = x * GRID_SIZE + y;
+                const cell = cells[index];
+                cell.innerHTML = `
+                    <div class="player">
+                        <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" 
+                             style="width: 80%; height: 80%;" alt="Player">
+                    </div>
+                `;
+            }
+        }
+
+        function showCatFoundEffect(position) {
+            const cells = document.querySelectorAll(".cell");
+            const x = position[0];
+            const y = position[1];
+
+            // Highlight neighboring cells
+            highlightNeighboringCells(x, y);
+
+            // Show cat found effect in target cell
+            const index = x * GRID_SIZE + y;
+            const cell = cells[index];
+            cell.innerHTML = `
+                <div class="cat-found">
+                    <img src="https://cdn-icons-png.flaticon.com/512/183/183985.png" 
+                         style="width: 80%; height: 80%;" alt="Cat Found!">
+                </div>
+            `;
+        }
+
+        function highlightNeighboringCells(x, y) {
+            const cells = document.querySelectorAll(".cell");
+
+            // Directions: up, down, left, right, diagonals
+            const directions = [
+                [-1, -1], [-1, 0], [-1, 1],
+                [0, -1],          [0, 1],
+                [1, -1], [1, 0], [1, 1]
+            ];
+
+            directions.forEach(([dx, dy]) => {
+                const nx = x + dx;
+                const ny = y + dy;
+
+                if (nx >= 0 && nx < GRID_SIZE && ny >= 0 && ny < GRID_SIZE) {
+                    const index = nx * GRID_SIZE + ny;
+                    const cell = cells[index];
+                    cell.classList.add("neighboring-cell");
+                }
+            });
+        }
+
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "ArrowUp") movePlayer("north");
+            else if (event.key === "ArrowDown") movePlayer("south");
+            else if (event.key === "ArrowLeft") movePlayer("west");
+            else if (event.key === "ArrowRight") movePlayer("east");
+        });
+
+        function movePlayer(direction) {
+            fetch("/move", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ direction: direction })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Actualizează poziția jucătorului
+                playerPosition = data.player_position;
+
+                // Actualizează grila, mesajele și efectele
+                updateGrid(playerPosition);
+                logMove(direction);
+                showMessage(data.message);
+
+                // Verifică dacă s-a găsit pisica
+                if (data.message.includes("found")) {
+                    showCatFoundEffect(data.player_position);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

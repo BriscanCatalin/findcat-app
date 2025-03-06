@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  findcat:
+    build: .
+    ports:
+      - "5000:5000"  # Exposează portul 5000 local către container
+    volumes:
+      - .:/app        # Montează directorul curent în container
+    environment:
+      - FLASK_ENV=development  # Mode de dezvoltare (reloading automata)
