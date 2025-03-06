@@ -9,46 +9,44 @@
             --primary: #2c3e50;
             --secondary: #3498db;
             --accent: #e74c3c;
-            --bg: #ecf0f1;
             --text: #2c3e50;
-            --grid-size: {{ grid_size }}; /* Numărul de rânduri/coloane */
+            --grid-size: {{ grid_size }};
         }
 
         body {
             margin: 0;
             min-height: 100vh;
             display: flex;
+            flex-direction: column; /* Schimbăm la coloană pe ecrane mobile */
             justify-content: center;
             align-items: center;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: var(--text);
             font-family: 'Arial', sans-serif;
-            overflow: hidden; /* Previne derulare generală */
+            overflow: hidden;
         }
 
         .container {
-            display: grid;
-            grid-template-columns: 25% 75%; /* Left 25%, Right 75% */
+            display: flex;
+            flex-direction: row; /* Default pe desktop */
             gap: 2rem;
             max-width: 100vw;
             width: 100%;
-            padding: 2rem;
-            background: rgba(255,255,255,0.9);
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
-        /* Left Panel (25%) */
+        /* Left Panel (Instrucțiuni, Log) */
         .sidebar {
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            height: 85%;
-            padding-right: 0.5rem;
-            padding-left: 0.5rem;
+            padding: 1rem;
             background: white;
             border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .header {
@@ -59,71 +57,76 @@
             border-radius: 10px;
         }
 
-        .instructions {
+        .instructions, .message-box {
             padding: 1rem;
             background: #f8f9fa;
             border: 1px solid #ddd;
             border-radius: 10px;
-        }
-
-        .message-box {
-            padding: 1rem;
-            background: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            text-align: center;
+            font-size: 1rem; /* Reducem fontul pe mobile */
         }
 
         .controls {
             display: grid;
-            grid-template-columns: 0.5fr 0.5fr 0.5fr 0.5fr;
+            grid-template-columns: repeat(2, 1fr); /* Buton după buton pe mobile */
+            gap: 1rem;
             padding: 1rem;
             background: white;
             border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            justify-items: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-btn {
+            padding: 1rem;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.25rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+            transition: all 0.3s;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.5);
         }
 
         .history-log {
             flex: 1;
-            max-height: 300px; /* Limită maximă pentru înălțime */
-            overflow-y: auto; /* Scrolabiliy doar aici */
+            max-height: 200px; /* Reducem înălțimea log-urilor pe mobile */
+            overflow-y: auto;
             border: 1px solid #ddd;
             border-radius: 10px;
         }
 
-        .history-log::-webkit-scrollbar {
-            width: 8px;
-        }
-
         .history-log p {
-            margin: 5px 0;
-            padding: 5px;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
             background: #f8f9fa;
             border-radius: 5px;
+            font-size: 0.9rem; /* Reducem fontul */
         }
 
-        /* Right Panel (75%) */
+        /* Right Panel (Grilă) */
         .game-container {
             display: flex;
-            align-items: center;
             justify-content: center;
-            height: 85%;
-            padding-right: 2rem;
-            overflow: hidden; /* Previne derulare */
+            align-items: center;
+            flex: 1; /* Ocupă mai mult spațiu pe mobile */
+            overflow: hidden;
         }
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(var(--grid-size), minmax(0, 1fr)); /* Auto-sizing cells */
-            grid-template-rows: repeat(var(--grid-size), minmax(0, 1fr)); /* Matrice pătratică */
-            height: 100%;
-            width: 100%; /* Ocupă întreaga lățime */
-            aspect-ratio: 1 / 0.70; /* Păstrează proporții pătratice */
+            grid-template-columns: repeat(var(--grid-size), minmax(10px, 1fr));
+            grid-template-rows: repeat(var(--grid-size), minmax(10px, 1fr));
+            gap: 2px;
+            width: 100%;
+            aspect-ratio: 1 / 1; /* Păstrează proporții pătratice */
             background: white;
             border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .cell {
@@ -132,36 +135,44 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
         }
 
         .player {
-            width: 80%;
-            height: 80%;
+            width: 60%; /* Reducem dimensiunea pionului pe mobile */
+            height: 60%;
             background: var(--accent);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 10px rgba(231,76,60,0.5);
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
         }
 
-        .cat-found {
-            width: 100%;
-            height: 100%;
-            background: gold;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: celebrate 2s infinite;
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column; /* Schimbăm la coloană pe mobile */
+            }
+
+            .sidebar {
+                width: 100%; /* Lărgim panoul stâng pe mobile */
+            }
+
+            .controls {
+                grid-template-columns: 1fr; /* Un singur buton pe linie */
+            }
+
+            .history-log {
+                max-height: 150px; /* Reducem înălțimea log-urilor */
+            }
+
+            .grid {
+                width: 100%; /* Grila ocupă întreaga lățime */
+                aspect-ratio: 1 / 1; /* Păstrează proporții pătratice */
+            }
         }
 
-        .neighboring-cell {
-            background: orange !important;
-            animation: flash 1s infinite;
-        }
-
+        /* Animations */
         @keyframes pulse {
             0% { transform: scale(0.9); }
             50% { transform: scale(1.1); }
@@ -179,44 +190,23 @@
             50% { opacity: 0.5; }
             100% { opacity: 1; }
         }
-
-        .control-btn {
-            padding: 15px;
-            background: var(--secondary);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            font-size: 1.5rem;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(52,152,219,0.3);
-            transition: all 0.3s;
-        }
-
-        .control-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 20px rgba(52,152,219,0.5);
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Left Panel (25%) -->
+        <!-- Left Panel -->
         <div class="sidebar">
-            <!-- Title -->
             <div class="header">
                 <h1>Invisible Cat Hunt 🐱</h1>
             </div>
 
-            <!-- Instructions -->
             <div class="instructions">
                 <p>Find the hidden cat by clicking on cells or using arrow keys.</p>
                 <p>Listen for hints about the cat's location.</p>
             </div>
 
-            <!-- Message Box -->
             <div class="message-box" id="message-box">🔍 Find the hidden cat!</div>
 
-            <!-- Controls -->
             <div class="controls">
                 <button class="control-btn" onclick="movePlayer('north')">⇧</button>
                 <button class="control-btn" onclick="movePlayer('west')">⇦</button>
@@ -224,11 +214,10 @@
                 <button class="control-btn" onclick="movePlayer('south')">⇩</button>
             </div>
 
-            <!-- History Log -->
             <div class="history-log" id="history-log"></div>
         </div>
 
-        <!-- Right Panel (75%) -->
+        <!-- Right Panel -->
         <div class="game-container">
             <div class="grid">
                 {% for i in range(grid_size) %}
@@ -242,33 +231,23 @@
 
     <script>
         const GRID_SIZE = {{ grid_size }};
-        let playerPosition = [0, 0];
 
         function clickCell(x, y) {
-            // Simulează mișcare către celulă clicată
             movePlayerToPosition(x, y);
         }
 
         function movePlayerToPosition(x, y) {
-            // Actualizează poziția jucătorului temporar
-            playerPosition = [x, y];
-
-            // Apelează backend-ul pentru validare
             fetch("/move", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ direction: `to_${x}_${y}` }) // Custom direction format
+                body: JSON.stringify({ direction: `to_${x}_${y}` })
             })
             .then(response => response.json())
             .then(data => {
-                // Actualizează grila cu noua poziție
                 updateGrid(data.player_position);
-
-                // Actualizează mesajele și istoricul
                 logMove(`to_${x}_${y}`);
                 showMessage(data.message);
 
-                // Verifică dacă s-a găsit pisica
                 if (data.message.includes("found")) {
                     showCatFoundEffect(data.player_position);
                 }
@@ -296,7 +275,6 @@
             const x = playerPosition[0];
             const y = playerPosition[1];
 
-            // Ensure position is within bounds
             if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE) {
                 const index = x * GRID_SIZE + y;
                 const cell = cells[index];
@@ -314,10 +292,8 @@
             const x = position[0];
             const y = position[1];
 
-            // Highlight neighboring cells
             highlightNeighboringCells(x, y);
 
-            // Show cat found effect in target cell
             const index = x * GRID_SIZE + y;
             const cell = cells[index];
             cell.innerHTML = `
@@ -331,7 +307,6 @@
         function highlightNeighboringCells(x, y) {
             const cells = document.querySelectorAll(".cell");
 
-            // Directions: up, down, left, right, diagonals
             const directions = [
                 [-1, -1], [-1, 0], [-1, 1],
                 [0, -1],          [0, 1],
@@ -365,15 +340,10 @@
             })
             .then(response => response.json())
             .then(data => {
-                // Actualizează poziția jucătorului
-                playerPosition = data.player_position;
-
-                // Actualizează grila, mesajele și efectele
-                updateGrid(playerPosition);
+                updateGrid(data.player_position);
                 logMove(direction);
                 showMessage(data.message);
 
-                // Verifică dacă s-a găsit pisica
                 if (data.message.includes("found")) {
                     showCatFoundEffect(data.player_position);
                 }

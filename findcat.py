@@ -2,7 +2,7 @@ import random
 from flask import Flask, render_template, jsonify, request
 
 app = Flask(__name__)
-GRID_SIZE = 100  # Dimensiunea grilei (poate fi ajustată)
+GRID_SIZE = 10  # Dimensiunea grilei (poate fi ajustată)
 
 class CatGame:
     def __init__(self):
